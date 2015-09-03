@@ -15,6 +15,17 @@ public class LongColumnSetter
         super(pageBuilder, column, defaultValue);
     }
 
+    // Set default rounding mode to keep backward compatibility
+    private RoundingMode roundingMode = RoundingMode.HALF_UP;
+
+    public RoundingMode getRoundingMode() {
+        return roundingMode;
+    }
+
+    public void setRoundingMode(RoundingMode roundingMode) {
+        this.roundingMode = roundingMode;
+    }
+
     @Override
     public void setNull()
     {
@@ -38,8 +49,7 @@ public class LongColumnSetter
     {
         long lv;
         try {
-            // TODO configurable rounding mode
-            lv = DoubleMath.roundToLong(v, RoundingMode.HALF_UP);
+            lv = DoubleMath.roundToLong(v, getRoundingMode());
         } catch (ArithmeticException ex) {
             // NaN / Infinite / -Infinite
             defaultValue.setLong(pageBuilder, column);
