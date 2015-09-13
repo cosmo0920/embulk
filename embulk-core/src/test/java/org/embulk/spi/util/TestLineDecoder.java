@@ -7,9 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import com.google.common.collect.ImmutableList;
-import org.junit.Rule;
-import org.junit.Before;
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 import org.embulk.config.ConfigSource;
 import org.embulk.spi.Exec;
 import org.embulk.spi.Buffer;
@@ -17,11 +15,16 @@ import org.embulk.spi.util.ListFileInput;
 import org.embulk.EmbulkTestRuntime;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.annotations.BeforeTest;
 
 public class TestLineDecoder
 {
-    @Rule
-    public EmbulkTestRuntime runtime = new EmbulkTestRuntime();
+    public EmbulkTestRuntime runtime;
+
+    @BeforeTest
+    public void setUp(){
+        runtime = new EmbulkTestRuntime();
+    }
 
     @Test
     public void testDefaultValues()
