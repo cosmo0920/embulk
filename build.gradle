@@ -28,6 +28,7 @@ allprojects {
 
     test {
         maxHeapSize = "1536m"
+        maxParallelForks = 4
     }
 
     //
