@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Rule;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static junitparams.JUnitParamsRunner.$;
@@ -21,7 +22,7 @@ import org.embulk.spi.Buffer;
 import org.embulk.spi.util.ListFileInput;
 import org.embulk.EmbulkTestRuntime;
 
-@RunWith(JUnitParamsRunner.class)
+@RunWith(Enclosed.class)
 public class TestLineDecoder
 {
     @Rule
@@ -93,123 +94,161 @@ public class TestLineDecoder
         assertEquals(expected, decoded);
     }
 
-    public Object[] parametersForTestDecodeBasic() {
-        return $(
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "test1\ntest2\ntest3\n"),
-                        ImmutableList.of("test1", "test2", "test3")),
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "てすと1\nテスト2\nてすと3\n"),
-                        ImmutableList.of("てすと1", "テスト2", "てすと3")),
-                $(StandardCharsets.UTF_16LE,
-                        bufferList(StandardCharsets.UTF_16LE, "てすと1\nテスト2\nてすと3\n"),
-                        ImmutableList.of("てすと1", "テスト2", "てすと3")),
-                $(Charset.forName("ms932"),
-                        bufferList(Charset.forName("ms932"), "てすと1\r\nテスト2\r\nてすと3\r\n"),
-                        ImmutableList.of("てすと1", "テスト2", "てすと3"))
-        );
-    }
-
-    @Test
-    @Parameters(method = "parametersForTestDecodeBasic")
-    public void testDecodeBasic(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
+    @RunWith(JUnitParamsRunner.class)
+    public static class LineDecoderParametrizedBasic
     {
-        assertDoDecode(charset, Newline.LF, source, expected);
+        @Rule
+        public EmbulkTestRuntime runtime = new EmbulkTestRuntime();
+
+        public Object[] parametersForTestDecodeBasic()
+        {
+            return $(
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "test1\ntest2\ntest3\n"),
+                            ImmutableList.of("test1", "test2", "test3")),
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "てすと1\nテスト2\nてすと3\n"),
+                            ImmutableList.of("てすと1", "テスト2", "てすと3")),
+                    $(StandardCharsets.UTF_16LE,
+                            bufferList(StandardCharsets.UTF_16LE, "てすと1\nテスト2\nてすと3\n"),
+                            ImmutableList.of("てすと1", "テスト2", "てすと3")),
+                    $(Charset.forName("ms932"),
+                            bufferList(Charset.forName("ms932"), "てすと1\r\nテスト2\r\nてすと3\r\n"),
+                            ImmutableList.of("てすと1", "テスト2", "てすと3"))
+            );
+        }
+
+        @Test
+        @Parameters(method = "parametersForTestDecodeBasic")
+        public void testDecodeBasic(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
+        {
+            assertDoDecode(charset, Newline.LF, source, expected);
+        }
     }
 
-    public Object[] parametersForTestDecodeBasicCRLF() {
-        return $(
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "test1\r\ntest2\r\ntest3\r\n"),
-                        ImmutableList.of("test1", "test2", "test3")),
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "てすと1\r\nテスト2\r\nてすと3\r\n"),
-                        ImmutableList.of("てすと1", "テスト2", "てすと3")),
-                $(StandardCharsets.UTF_16LE,
-                        bufferList(StandardCharsets.UTF_16LE, "てすと1\r\nテスト2\r\nてすと3\r\n"),
-                        ImmutableList.of("てすと1", "テスト2", "てすと3")),
-                $(Charset.forName("ms932"),
-                        bufferList(Charset.forName("ms932"), "てすと1\r\nテスト2\r\nてすと3\r\n"),
-                        ImmutableList.of("てすと1", "テスト2", "てすと3"))
-        );
+    @RunWith(JUnitParamsRunner.class)
+    public static class LineDecoderParametrizedBasicCRLF {
+        @Rule
+        public EmbulkTestRuntime runtime = new EmbulkTestRuntime();
+
+        public Object[] parametersForTestDecodeBasicCRLF()
+        {
+            return $(
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "test1\r\ntest2\r\ntest3\r\n"),
+                            ImmutableList.of("test1", "test2", "test3")),
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "てすと1\r\nテスト2\r\nてすと3\r\n"),
+                            ImmutableList.of("てすと1", "テスト2", "てすと3")),
+                    $(StandardCharsets.UTF_16LE,
+                            bufferList(StandardCharsets.UTF_16LE, "てすと1\r\nテスト2\r\nてすと3\r\n"),
+                            ImmutableList.of("てすと1", "テスト2", "てすと3")),
+                    $(Charset.forName("ms932"),
+                            bufferList(Charset.forName("ms932"), "てすと1\r\nテスト2\r\nてすと3\r\n"),
+                            ImmutableList.of("てすと1", "テスト2", "てすと3"))
+            );
+        }
+
+        @Test
+        @Parameters(method = "parametersForTestDecodeBasicCRLF")
+        public void testDecodeBasicCRLF(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
+        {
+            assertDoDecode(charset, Newline.CRLF, source, expected);
+        }
     }
 
-    @Test
-    @Parameters(method = "parametersForTestDecodeBasicCRLF")
-    public void testDecodeBasicCRLF(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
+    @RunWith(JUnitParamsRunner.class)
+    public static class LineDecoderParametrizedBasicTail
     {
-        assertDoDecode(charset, Newline.CRLF, source, expected);
+        @Rule
+        public EmbulkTestRuntime runtime = new EmbulkTestRuntime();
+
+        public Object[] parametersForTestDecodeBasicTail()
+        {
+            return $(
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "test1"),
+                            ImmutableList.of("test1")),
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "てすと1"),
+                            ImmutableList.of("てすと1")),
+                    $(StandardCharsets.UTF_16LE,
+                            bufferList(StandardCharsets.UTF_16LE, "てすと1"),
+                            ImmutableList.of("てすと1")),
+                    $(Charset.forName("ms932"),
+                            bufferList(Charset.forName("ms932"), "てすと1"),
+                            ImmutableList.of("てすと1"))
+            );
+        }
+
+        @Test
+        @Parameters(method = "parametersForTestDecodeBasicTail")
+        public void testDecodeBasicTail(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
+        {
+            assertDoDecode(charset, Newline.LF, source, expected);
+        }
     }
 
-    public Object[] parametersForTestDecodeBasicTail() {
-        return $(
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "test1"),
-                        ImmutableList.of("test1")),
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "てすと1"),
-                        ImmutableList.of("てすと1")),
-                $(StandardCharsets.UTF_16LE,
-                        bufferList(StandardCharsets.UTF_16LE, "てすと1"),
-                        ImmutableList.of("てすと1")),
-                $(Charset.forName("ms932"),
-                        bufferList(Charset.forName("ms932"), "てすと1"),
-                        ImmutableList.of("てすと1"))
-        );
-    }
-
-    @Test
-    @Parameters(method = "parametersForTestDecodeBasicTail")
-    public void testDecodeBasicTail(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
+    @RunWith(JUnitParamsRunner.class)
+    public static class LineDecoderParametrizedBasicChunksLF
     {
-        assertDoDecode(charset, Newline.LF, source, expected);
+        @Rule
+        public EmbulkTestRuntime runtime = new EmbulkTestRuntime();
+
+        public Object[] parametersForTestDecodeChunksLF()
+        {
+            return $(
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "t", "1", "\n", "t", "2"),
+                            ImmutableList.of("t1", "t2")),
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "て", "1", "\n", "す", "2"),
+                            ImmutableList.of("て1", "す2")),
+                    $(StandardCharsets.UTF_16LE,
+                            bufferList(StandardCharsets.UTF_16LE, "て", "1", "\n", "す", "2"),
+                            ImmutableList.of("て1", "す2")),
+                    $(Charset.forName("ms932"),
+                            bufferList(Charset.forName("ms932"), "て", "1", "\n", "す", "2"),
+                            ImmutableList.of("て1", "す2"))
+            );
+        }
+
+        @Test
+        @Parameters(method = "parametersForTestDecodeChunksLF")
+        public void testDecodeBasicChunksLF(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception {
+            assertDoDecode(charset, Newline.LF, source, expected);
+        }
     }
 
-    public Object[] parametersForTestDecodeChunksLF() {
-        return $(
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "t", "1", "\n", "t", "2"),
-                        ImmutableList.of("t1", "t2")),
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "て", "1", "\n", "す", "2"),
-                        ImmutableList.of("て1", "す2")),
-                $(StandardCharsets.UTF_16LE,
-                        bufferList(StandardCharsets.UTF_16LE, "て", "1", "\n", "す", "2"),
-                        ImmutableList.of("て1", "す2")),
-                $(Charset.forName("ms932"),
-                        bufferList(Charset.forName("ms932"), "て", "1", "\n", "す", "2"),
-                        ImmutableList.of("て1", "す2"))
-        );
-    }
-
-    @Test
-    @Parameters(method = "parametersForTestDecodeChunksLF")
-    public void testDecodeBasicChunksLF(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
+    @RunWith(JUnitParamsRunner.class)
+    public static class LineDecoderParametrizedBasicChunksCRLF
     {
-        assertDoDecode(charset, Newline.LF, source, expected);
-    }
+        @Rule
+        public EmbulkTestRuntime runtime = new EmbulkTestRuntime();
 
-    public Object[] parametersForTestDecodeChunksCRLF() {
-        return $(
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "t", "1", "\r\n", "t", "2", "\r", "\n", "t3"),
-                        ImmutableList.of("t1", "t2", "t3")),
-                $(StandardCharsets.UTF_8,
-                        bufferList(StandardCharsets.UTF_8, "て", "1", "\r\n", "す", "2", "\r", "\n", "と3"),
-                        ImmutableList.of("て1", "す2", "と3")),
-                $(StandardCharsets.UTF_16LE,
-                        bufferList(StandardCharsets.UTF_16LE, "て", "1", "\r\n", "す", "2", "\r", "\n", "と3"),
-                        ImmutableList.of("て1", "す2", "と3")),
-                $(Charset.forName("ms932"),
-                        bufferList(Charset.forName("ms932"), "て", "1", "\r\n", "す", "2", "\r", "\n", "と3"),
-                        ImmutableList.of("て1", "す2", "と3"))
-        );
-    }
+        public Object[] parametersForTestDecodeChunksCRLF()
+        {
+            return $(
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "t", "1", "\r\n", "t", "2", "\r", "\n", "t3"),
+                            ImmutableList.of("t1", "t2", "t3")),
+                    $(StandardCharsets.UTF_8,
+                            bufferList(StandardCharsets.UTF_8, "て", "1", "\r\n", "す", "2", "\r", "\n", "と3"),
+                            ImmutableList.of("て1", "す2", "と3")),
+                    $(StandardCharsets.UTF_16LE,
+                            bufferList(StandardCharsets.UTF_16LE, "て", "1", "\r\n", "す", "2", "\r", "\n", "と3"),
+                            ImmutableList.of("て1", "す2", "と3")),
+                    $(Charset.forName("ms932"),
+                            bufferList(Charset.forName("ms932"), "て", "1", "\r\n", "す", "2", "\r", "\n", "と3"),
+                            ImmutableList.of("て1", "す2", "と3"))
+            );
+        }
 
-    @Test
-    @Parameters(method = "parametersForTestDecodeChunksCRLF")
-    public void testDecodeBasicChunksCRLF(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
-    {
-        assertDoDecode(charset, Newline.CRLF, source, expected);
+        @Test
+        @Parameters(method = "parametersForTestDecodeChunksCRLF")
+        public void testDecodeBasicChunksCRLF(Charset charset, List<Buffer> source, ImmutableList expected) throws Exception
+        {
+            assertDoDecode(charset, Newline.CRLF, source, expected);
+        }
     }
 }
