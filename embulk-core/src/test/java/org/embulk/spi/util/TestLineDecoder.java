@@ -13,13 +13,13 @@ import org.embulk.spi.Exec;
 import org.embulk.spi.Buffer;
 import org.embulk.spi.util.ListFileInput;
 import org.embulk.EmbulkTestRuntime;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import org.testng.annotations.BeforeTest;
 
 public class TestLineDecoder
 {
-    public EmbulkTestRuntime runtime;
+    private static EmbulkTestRuntime runtime;
 
     @BeforeTest
     public void setUp(){
@@ -29,7 +29,7 @@ public class TestLineDecoder
     @Test
     public void testDefaultValues()
     {
-        ConfigSource config = Exec.newConfigSource();
+        ConfigSource config = runtime.getExec().newConfigSource();
         LineDecoder.DecoderTask task = config.loadConfig(LineDecoder.DecoderTask.class);
         assertEquals(StandardCharsets.UTF_8, task.getCharset());
         assertEquals(Newline.CRLF, task.getNewline());
@@ -38,7 +38,7 @@ public class TestLineDecoder
     @Test
     public void testLoadConfig()
     {
-        ConfigSource config = Exec.newConfigSource()
+        ConfigSource config = runtime.getExec().newConfigSource()
             .set("charset", "utf-16")
             .set("newline", "CRLF");
         LineDecoder.DecoderTask task = config.loadConfig(LineDecoder.DecoderTask.class);
@@ -48,7 +48,7 @@ public class TestLineDecoder
 
     private static LineDecoder.DecoderTask getExampleConfig(Charset charset, Newline newline)
     {
-        ConfigSource config = Exec.newConfigSource()
+        ConfigSource config = runtime.getExec().newConfigSource()
             .set("charset", charset)
             .set("newline", newline);
         return config.loadConfig(LineDecoder.DecoderTask.class);
