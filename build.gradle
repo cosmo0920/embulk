@@ -108,6 +108,12 @@ subprojects {
             }
         }
 
+        task testng(type: Test) {
+          useTestNG()
+        }
+
+        check.dependsOn testng
+
         findbugs {
             ignoreFailures = true
         }
